@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - include:
+      file: /db/changelog/changes/create-movie-character-seq.sql
+  - include:
+      file: /db/changelog/changes/create-table-movie_character.sql
+  - include:
+      file: /db/changelog/changes/create-location-seq.sql
+  - include:
+      file: /db/changelog/changes/create-table-location.sql
+  - include:
+      file: /db/changelog/changes/create-episode-seq.sql
+  - include:
+      file: /db/changelog/changes/create-table-episode.sql
+  - include:
+      file: /db/changelog/changes/add-type-image-species-url-created-columns-to-movie-character.sql
+  - include:
+      file: /db/changelog/changes/add-many-to-many-between-movie-character-and-episode.sql
