@@ -1,6 +1,8 @@
 package springboot.rickandmorty.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import springboot.rickandmorty.exception.NoEntityFoundException;
@@ -25,6 +27,7 @@ public class EpisodeServiceImpl implements EpisodeService {
     private final EpisodeRepository episodeRepository;
     private final ApiEpisodeDtoMapper apiEpisodeDtoMapper;
     private final HttpClient httpClient;
+    private static final Logger logger = LogManager.getLogger(EpisodeServiceImpl.class);
 
     @Scheduled(cron = "${episode.cron.value}")
     @Override
@@ -38,11 +41,13 @@ public class EpisodeServiceImpl implements EpisodeService {
                     ApiEpisodeResponseDto.class);
             saveAndUpdateEpisodes(apiResponseDto);
         }
+        logger.info("Episodes were integrated with Rick and Morty api");
     }
 
     @Override
     public Episode findById(Long id) {
         return episodeRepository.findById(id).orElseThrow(() -> {
+            logger.error("Episode with id: " + id + " doesn't exist");
             throw new NoEntityFoundException("Episode with id: "
                     + id + " doesn't exist");
         });
@@ -79,10 +84,9 @@ public class EpisodeServiceImpl implements EpisodeService {
 
         List<Episode> charactersForUpdating = externalIdsOfElementsForUpdating.stream()
                 .map(i -> apiEpisodeDtoMapper.toModel(fetchedDtos.get(i)))
-                .map(e -> {
+                .peek(e -> {
                     Episode episode = existingCharactersMap.get(e.getExternalId());
                     e.setId(episode.getId());
-                    return e;
                 })
                 .collect(Collectors.toList());
         episodeRepository.saveAll(charactersForUpdating);

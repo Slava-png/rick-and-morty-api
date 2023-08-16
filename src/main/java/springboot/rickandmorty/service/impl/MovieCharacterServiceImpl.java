@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import springboot.rickandmorty.exception.NoEntityFoundException;
@@ -28,6 +30,7 @@ public class MovieCharacterServiceImpl implements MovieCharacterService {
     private final ApiCharacterDtoMapper apiCharacterDtoMapper;
     private final LocationRepository locationRepository;
     private final EpisodeRepository episodeRepository;
+    private static final Logger logger = LogManager.getLogger(MovieCharacterServiceImpl.class);
 
     @Scheduled(cron = "${movie_character.cron.value}")
     @Override
@@ -40,6 +43,7 @@ public class MovieCharacterServiceImpl implements MovieCharacterService {
                     ApiCharacterResponseDto.class);
             saveAndUpdateCharacters(apiResponseDto);
         }
+        logger.info("Movie characters were integrated with Rick and Morty api");
     }
 
     @Override
@@ -48,6 +52,7 @@ public class MovieCharacterServiceImpl implements MovieCharacterService {
         long randomId = (long) (Math.random() * count);
 
         return movieCharacterRepository.findById(randomId).orElseThrow(() -> {
+            logger.error("Movie character with id: " + randomId + " doesn't exist");
             throw new NoEntityFoundException("Movie character with id: "
                     + randomId + " doesn't exist");
         });

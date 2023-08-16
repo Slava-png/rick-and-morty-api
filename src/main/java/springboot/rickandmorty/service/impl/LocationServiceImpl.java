@@ -1,6 +1,8 @@
 package springboot.rickandmorty.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import springboot.rickandmorty.exception.NoEntityFoundException;
@@ -25,6 +27,7 @@ public class LocationServiceImpl implements LocationService {
     private final LocationRepository locationRepository;
     private final ApiLocationDtoMapper apiLocationDtoMapper;
     private final HttpClient httpClient;
+    private static final Logger logger = LogManager.getLogger(LocationServiceImpl.class);
 
     @Scheduled(cron = "${location.cron.value}")
     @Override
@@ -38,11 +41,13 @@ public class LocationServiceImpl implements LocationService {
                     ApiLocationResponseDto.class);
             saveAndUpdateLocations(apiResponseDto);
         }
+        logger.info("Locations were integrated with Rick and Morty api");
     }
 
     @Override
     public Location findById(Long id) {
         return locationRepository.findById(id).orElseThrow(() -> {
+            logger.error("Location with id: " + id + " doesn't exist");
             throw new NoEntityFoundException("Location with id: "
                     + id + " doesn't exist");
         });
@@ -79,10 +84,9 @@ public class LocationServiceImpl implements LocationService {
 
         List<Location> locationsForUpdating = externalIdsOfElementsForUpdating.stream()
                 .map(i -> apiLocationDtoMapper.toModel(fetchedDtos.get(i)))
-                .map(e -> {
+                .peek(e -> {
                     Location location = existingLocationssMap.get(e.getExternalId());
                     e.setId(location.getId());
-                    return e;
                 })
                 .collect(Collectors.toList());
         locationRepository.saveAll(locationsForUpdating);

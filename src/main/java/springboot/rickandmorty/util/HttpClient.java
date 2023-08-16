@@ -7,11 +7,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
 public class HttpClient {
+    private static final Logger logger = LogManager.getLogger(HttpClient.class);
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -26,6 +29,7 @@ public class HttpClient {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             return objectMapper.readValue(response.getEntity().getContent(), clazz);
         } catch (IOException e) {
+            logger.error("Can't fetch data from url: " + url);
             throw new RuntimeException("Can't fetch data from url: " + url, e);
         }
     }

@@ -9,7 +9,5 @@ import java.util.Set;
 public interface MovieCharacterRepository extends JpaRepository<MovieCharacter, Long> {
     List<MovieCharacter> findMovieCharactersByExternalIdIn(Set<Long> ids);
 
-    MovieCharacter findMovieCharacterByExternalId(Long externalId);
-
     List<MovieCharacter> findMovieCharactersByNameContainingIgnoreCase(String pattern);
 }
