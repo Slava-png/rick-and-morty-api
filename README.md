@@ -32,3 +32,6 @@ All endpoints use HTTP Get method
 * Spring Data;
 * PostgreSQL;
 * Lombok
+
+## 🐳Docker image of project
+You can access my solution to rick-and-morty api by pulling docker image, just run this command in your terminal `docker pull slava448/rick-and-morty`
